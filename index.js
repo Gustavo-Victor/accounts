@@ -3,12 +3,14 @@ import chalk from "chalk";
 import inquirer from "inquirer"; 
 import fs from "node:fs"; 
 
+
 // constants / operations
 const CREATE_ACCOUNT = "Create account"; 
 const CHECK_BALANCE = "Check balance";
 const DEPOSIT = "Deposit"; 
 const WITHDRAW = "Withdraw";
 const EXIT = "Exit"; 
+
 
 // operation
 async function operation() {
@@ -38,19 +40,17 @@ async function operation() {
             break;
             case DEPOSIT: 
             break;
-            case DEPOSIT: 
-            break;
             case WITHDRAW: 
             break;
-            default: 
-            ;
+            case EXIT:
+                console.log(chalk.bgBlue.black("Thank you for using Accounts."));
+                process.exit();   
         }
 
     } catch (error) {
-        console.log(chalk.red(error)); 
+        console.log(chalk.bgRed.black(error)); 
     }
 }
-operation(); 
 
 
 //create account 
@@ -58,8 +58,8 @@ function createAccount() {
     console.log(chalk.bgGreen.black("Thank you for choosing our bank!")); 
     console.log(chalk.green("Set your account options below: ")); 
     buildAccount(); 
-
 }
+
 
 async function buildAccount() {
     try {
@@ -73,7 +73,10 @@ async function buildAccount() {
         const { accountName } = response; 
 
         if(!accountName) {
-            throw new Error("Account name is required."); 
+            // throw new Error("Account name is required."); 
+            console.log(chalk.bgRed.black("Account name is required")); 
+            buildAccount();
+            return ;
         }
         
         console.info(accountName); 
@@ -98,10 +101,11 @@ async function buildAccount() {
         operation(); 
         
     } catch (error) {
-        console.log(chalk.red(error));
+        console.log(chalk.bgRed.black(error));
 
     }
 } 
+
 
 // check balance
 
@@ -112,4 +116,4 @@ async function buildAccount() {
 // withdraw
 
 
-// exit
+operation(); 
