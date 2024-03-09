@@ -1,0 +1,29 @@
+{
+  "name": "accounts",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Project to simulate operations on user bank accounts",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "accounts",
+    "bank accounts",
+    "bank",
+    "node",
+    "node.js",
+    "chalk",
+    "inquirer"
+  ],
+  "author": "Gustavo Victor",
+  "repository": {
+    "url": "",
+    "type": "git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "inquirer": "^8.1.2"
+  }
+}
