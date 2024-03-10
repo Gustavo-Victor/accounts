@@ -37,6 +37,7 @@ async function operation() {
                 createAccount(); 
             break; 
             case CHECK_BALANCE: 
+                getAccountBalance();
             break;
             case DEPOSIT: 
                 deposit();
@@ -67,7 +68,7 @@ async function buildAccount() {
         const response = await inquirer.prompt([
             { 
                 name: "accountName",
-                message: "\nEnter a name for the account: "
+                message: "Enter a name for the account: "
              },
         ]); 
 
@@ -109,6 +110,37 @@ async function buildAccount() {
 
 
 // check balance
+async function getAccountBalance() {
+    try {
+        const response = await inquirer.prompt([
+            {
+                name: "accountName",
+                message: "Enter the name of the account: "
+            }
+        ]); 
+
+        const { accountName } = response; 
+
+        if(!accountName) {
+            console.log(chalk.bgRed.black("Account name is required."));
+            return getAccountBalance(); 
+        }
+
+        const accountInfo = getAccount(accountName); 
+
+        if(!accountInfo) {
+            console.log(chalk.bgRed.black("This account does not exist."));
+            return operation(); 
+        }
+        
+        const { balance } = accountInfo; 
+
+        console.log(chalk.bgBlue.black(`The current balance is $${parseFloat(balance)}`));
+        operation(); 
+    } catch (error) {
+        console.log(chalk.bgRed.black(error)); 
+    }
+}
 
 
 // deposit
@@ -195,12 +227,23 @@ async function addAmount(accountName) {
 
 // get account data
 function getAccount(accountName) {
-    const accountJSON = fs.readFileSync(`./user_accounts/${accountName}.json`, {
-        encoding: "utf-8",
-        flag: "r"
-    });
+    try {
+        const accountJSON = fs.readFileSync(`./user_accounts/${accountName}.json`, {
+            encoding: "utf-8",
+            flag: "r"
+        }, (err) => {
+            if(err) {
+                throw new Error("This account does not exist."); 
+            }
+        });
 
-    return JSON.parse(accountJSON); 
+        return JSON.parse(accountJSON); 
+    } catch (error) {
+        console.log(chalk.bgRed.black(error)); 
+        return false;
+    }
+
+    
 }
 
 
