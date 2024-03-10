@@ -39,6 +39,7 @@ async function operation() {
             case CHECK_BALANCE: 
             break;
             case DEPOSIT: 
+                deposit();
             break;
             case WITHDRAW: 
             break;
@@ -111,9 +112,97 @@ async function buildAccount() {
 
 
 // deposit
+async function deposit() {
+    try {
+        const response = await inquirer.prompt([
+            {
+                name: "accountName",
+                message: "Which account would you like to deposit into?"
+            }
+        ]); 
+
+        const { accountName } = response; 
+        
+        if (!accountName) {
+            console.log(chalk.bgRed.black("Account name is required")); 
+            return deposit(); 
+        }
+
+        if(!accountExists(accountName)) {
+            return deposit(); 
+        }
+
+        addAmount(accountName); 
+    } catch (error) {
+        console.log(chalk.bgRed.black(error)); 
+    }
+}
 
 
 // withdraw
 
 
+// check if account exists
+function accountExists(accountName) {
+    if(!fs.existsSync(`./user_accounts/${accountName}.json`)) {
+        console.log(chalk.bgRed.black("This account does not exist. choose another name!")); 
+        return false; 
+    } 
+    return true; 
+}
+
+
+// add ammount 
+async function addAmount(accountName) {
+    try {
+        const amountResponse = await inquirer.prompt([
+            {
+                name: "amount",
+                message: "Which amount would you like to deposit into the account?"
+            }
+        ]); 
+
+        let { amount } = amountResponse; 
+
+        if(!String(amount)) {
+            console.log(chalk.bgRed.black("Amount is required.")); 
+            return addAmount(accountName); 
+        }
+
+        if(isNaN(Number(amount))) {
+            console.log(chalk.bgRed.black("Amount must be a number.")); 
+            return addAmount(accountName); 
+        }
+
+        // deposit
+        const accountObj = getAccount(accountName); 
+        accountObj.balance = parseFloat(amount) + parseFloat(accountObj.balance);
+        const accountJSON = JSON.stringify(accountObj);
+
+        fs.writeFileSync(`./user_accounts/${accountName}.json`, accountJSON, (err) => {
+            if(err) {
+                throw new Error("Failed to deposit."); 
+            }            
+        }); 
+
+        console.log(chalk.green(`The amount of $${parseFloat(amount)} was deposited into the account.`)); 
+        return operation();         
+    } catch (error) {
+        console.log(chalk.bgRed.black(error)); 
+    }
+}
+
+
+// get account data
+function getAccount(accountName) {
+    const accountJSON = fs.readFileSync(`./user_accounts/${accountName}.json`, {
+        encoding: "utf-8",
+        flag: "r"
+    });
+
+    return JSON.parse(accountJSON); 
+}
+
+
+// start application
 operation(); 
